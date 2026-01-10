@@ -235,17 +235,3 @@ Key parameters in `FigureConfig`:
 5. File names follow academic conventions with underscores and capitalized words (e.g., `Spatial_Distribution.png`)
 6. The `DataLoader` class uses lazy loading to optimize memory usage
 7. Interactive maps are standalone HTML files that can be opened directly in a web browser
-
-## Migration from Original Notebook
-
-The original plotting code has been:
-1. Extracted into modular functions in `plotters.py`
-2. Parameterized via `FigureConfig`
-3. Organized into high-level generators in `figure_generators.py`
-4. Simplified in `generate_figures.ipynb` with easy-to-use interfaces
-
-The functionality remains the same, but the code is now:
-- More maintainable
-- Easier to customize
-- Better organized
-- Reusable across projects
