@@ -20,6 +20,8 @@ from .figure_generators import (
     generate_figure_s6,
     generate_figure_5,
     generate_figure_s7,
+    generate_figure_6,
+    generate_figure_s8,
     generate_all_figures,
 )
 
@@ -41,6 +43,8 @@ __all__ = [
     'generate_figure_s6',
     'generate_figure_5',
     'generate_figure_s7',
+    'generate_figure_6',
+    'generate_figure_s8',
     'generate_all_figures',
 ]
 

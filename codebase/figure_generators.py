@@ -12,6 +12,7 @@ FIGURES_GENERATION_DIR = Path(__file__).parent.parent.resolve()
 from .data_loader import get_data_loader
 from .config import FigureConfig, DEFAULT_REGIONS
 from .utils import get_category_colors, get_season_colors
+from .coherence_maps import plot_coherence_map_overview
 from .plotters import (
     plot_ssi_cdf,
     plot_catchment_type_maps,
@@ -360,12 +361,12 @@ def generate_figure_3(
     config: Optional[FigureConfig] = None,
 ) -> None:
     """
-    Generate Figure 3: Coherence Consistency Heatmap.
+    Generate Figure 3: Regional WI-Q coherence maps.
     
     Parameters:
     -----------
     season : str
-        'dormant' or 'growing' (growing season might go to Figure S5)
+        'dormant' or 'growing' (growing season goes to Figure S5)
     data_folder : str
         Path to data folder
     save_path : str, optional
@@ -387,7 +388,7 @@ def generate_figure_3(
     if save:
         if save_path is None:
             fig_num = 'Fig. 3' if season == 'dormant' else 'Fig. S5'
-            final_save_path = str(_get_figures_path(config) / fig_num / f'Heatmap_Coherence_Consistency_{season}.png')
+            final_save_path = str(_get_figures_path(config) / fig_num / f'Coherence_Map_{season}.png')
         else:
             final_save_path = str(Path(save_path)) if Path(save_path).is_absolute() else str(FIGURES_GENERATION_DIR / save_path)
         
@@ -395,6 +396,46 @@ def generate_figure_3(
         if save_dir:
             os.makedirs(save_dir, exist_ok=True)
     
+    plot_coherence_map_overview(
+        metadata_df=metadata,
+        season=season,
+        save_path=final_save_path,
+        show=show,
+        config=config
+    )
+
+
+def generate_figure_4(
+    season: str = 'dormant',
+    data_folder: str = '../../data/Global Data V0.3',
+    save_path: Optional[str] = None,
+    save: bool = True,
+    show: bool = False,
+    config: Optional[FigureConfig] = None,
+) -> None:
+    """
+    Generate Figure 4: Coherence-consistency heatmap.
+
+    Growing season goes to Figure S6.
+    """
+    if config is None:
+        config = FigureConfig()
+
+    loader = get_data_loader(data_folder)
+    metadata = loader.metadata_dormant if season == 'dormant' else loader.metadata_growing
+
+    final_save_path = None
+    if save:
+        if save_path is None:
+            fig_num = 'Fig. 4' if season == 'dormant' else 'Fig. S6'
+            final_save_path = str(_get_figures_path(config) / fig_num / f'Heatmap_Coherence_Consistency_{season}.png')
+        else:
+            final_save_path = str(Path(save_path)) if Path(save_path).is_absolute() else str(FIGURES_GENERATION_DIR / save_path)
+
+        save_dir = os.path.dirname(final_save_path)
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
+
     plot_coherence_consistency_heatmap(
         df=metadata,
         save_path=final_save_path,
@@ -455,7 +496,18 @@ def generate_figure_s4(
     )
 
 
-def generate_figure_4(
+def generate_figure_s6(
+    data_folder: str = '../../data/Global Data V0.3',
+    save_path: Optional[str] = None,
+    save: bool = True,
+    show: bool = False,
+    config: Optional[FigureConfig] = None,
+) -> None:
+    """Generate Figure S6: Coherence-consistency heatmap (growing season)."""
+    generate_figure_4(season='growing', data_folder=data_folder, save_path=save_path, save=save, show=show, config=config)
+
+
+def generate_figure_5(
     season: str = 'dormant',
     data_folder: str = '../../data/Global Data V0.3',
     save_path: Optional[str] = None,
@@ -464,8 +516,8 @@ def generate_figure_4(
     config: Optional[FigureConfig] = None,
 ) -> None:
     """
-    Generate Figure 4: Magnitude CV by Coherency (dormant season).
-    Growing season goes to Figure S6.
+    Generate Figure 5: Magnitude CV by Coherency (dormant season).
+    Growing season goes to Figure S7.
     
     Parameters:
     -----------
@@ -495,7 +547,7 @@ def generate_figure_4(
     final_save_path = None
     if save:
         if save_path is None:
-            fig_num = 'Fig. 4' if season == 'dormant' else 'Fig. S6'
+            fig_num = 'Fig. 5' if season == 'dormant' else 'Fig. S7'
             final_save_path = str(_get_figures_path(config) / fig_num / f'Mag_CV_Vs_Coherency_{season}.png')
         else:
             final_save_path = str(Path(save_path)) if Path(save_path).is_absolute() else str(FIGURES_GENERATION_DIR / save_path)
@@ -512,19 +564,20 @@ def generate_figure_4(
     )
 
 
-def generate_figure_s6(
+def generate_figure_s7(
     data_folder: str = '../../data/Global Data V0.3',
     save_path: Optional[str] = None,
     save: bool = True,
     show: bool = False,
     config: Optional[FigureConfig] = None,
 ) -> None:
-    """Generate Figure S6: Magnitude CV by Coherency (growing season)."""
-    generate_figure_4(season='growing', data_folder=data_folder, save_path=save_path, save=save, show=show, config=config)
+    """Generate Figure S7: Magnitude CV by Coherency (growing season)."""
+    generate_figure_5(season='growing', data_folder=data_folder, save_path=save_path, save=save, show=show, config=config)
 
 
-def generate_figure_5(
+def generate_figure_6(
     season: str = 'dormant',
+    region: Optional[str] = None,
     data_folder: str = '../../data/Global Data V0.3',
     save_path: Optional[str] = None,
     save: bool = True,
@@ -532,13 +585,16 @@ def generate_figure_5(
     config: Optional[FigureConfig] = None,
 ) -> None:
     """
-    Generate Figure 5: Hydrologic Response Comparison.
-    Growing season goes to Figure S7.
+    Generate Figure 6: Hydrologic Response Comparison.
+    Growing season goes to Figure S8.
     
     Parameters:
     -----------
     season : str
         'dormant' or 'growing'
+    region : str, optional
+        Region name: 'oceania', 'southern_africa', 'europe', 'north_america', 'south_america', 'southeast_asia'
+        If None, uses all events globally.
     data_folder : str
         Path to data folder
     save_path : str, optional
@@ -555,12 +611,33 @@ def generate_figure_5(
     
     loader = get_data_loader(data_folder)
     events = loader.event_dormant if season == 'dormant' else loader.event_growing
+    metadata = loader.metadata_dormant if season == 'dormant' else loader.metadata_growing
+    region_name = None
+
+    if region is not None:
+        if region not in DEFAULT_REGIONS or region == 'globe':
+            raise ValueError(f"Invalid region: {region}. Must be one of: oceania, southern_africa, europe, north_america, south_america, southeast_asia")
+        if 'country' not in metadata.columns:
+            raise ValueError("Missing required 'country' column in metadata; cannot filter Figure 6 by region.")
+
+        region_config = DEFAULT_REGIONS[region]
+        region_name = region_config.name
+        region_gcins = metadata[metadata['country'].isin(region_config.countries)].index.astype(str)
+        region_gcins_set = set(region_gcins.tolist())
+        events = events[events.index.astype(str).isin(region_gcins_set)]
+
+        if len(events) == 0:
+            raise ValueError(f"No events available for region: {region_name}")
     
     final_save_path = None
     if save:
         if save_path is None:
-            fig_num = 'Fig. 5' if season == 'dormant' else 'Fig. S7'
-            final_save_path = str(_get_figures_path(config) / fig_num / 'Mag_Comparison_Combined_CDF.png')
+            fig_num = 'Fig. 6' if season == 'dormant' else 'Fig. S8'
+            if region_name is None:
+                final_save_path = str(_get_figures_path(config) / fig_num / 'Mag_Comparison_Combined_CDF.png')
+            else:
+                region_file_name = region_name.replace(' ', '_')
+                final_save_path = str(_get_figures_path(config) / fig_num / f'Mag_Comparison_Combined_CDF_{region_file_name}.png')
         else:
             final_save_path = str(Path(save_path)) if Path(save_path).is_absolute() else str(FIGURES_GENERATION_DIR / save_path)
         
@@ -571,21 +648,22 @@ def generate_figure_5(
     plot_hydrologic_response_comparison(
         events_df=events,
         category_colors=config.category_colors,
+        region_name=region_name,
         save_path=final_save_path,
         show=show,
         config=config
     )
 
 
-def generate_figure_s7(
+def generate_figure_s8(
     data_folder: str = '../../data/Global Data V0.3',
     save_path: Optional[str] = None,
     save: bool = True,
     show: bool = False,
     config: Optional[FigureConfig] = None,
 ) -> None:
-    """Generate Figure S7: Hydrologic Response Comparison (growing season)."""
-    generate_figure_5(season='growing', data_folder=data_folder, save_path=save_path, save=save, show=show, config=config)
+    """Generate Figure S8: Hydrologic Response Comparison (growing season)."""
+    generate_figure_6(season='growing', data_folder=data_folder, save_path=save_path, save=save, show=show, config=config)
 
 
 def generate_all_figures(
@@ -635,8 +713,8 @@ def generate_all_figures(
     print("Generating Figure 2 (Seasonal transitions)...")
     generate_figure_2(region=None, data_folder=data_folder, show=show, config=config)
     
-    # Figure 3 and S5 (Coherence heatmaps)
-    print("Generating Figure 3 and S5 (Coherence heatmaps)...")
+    # Figure 3 and S5 (Coherence maps)
+    print("Generating Figure 3 and S5 (Coherence maps)...")
     for season in ['dormant', 'growing']:
         generate_figure_3(season=season, data_folder=data_folder, show=show, config=config)
     
@@ -645,15 +723,19 @@ def generate_all_figures(
     for season in ['dormant', 'growing']:
         generate_figure_s4(season=season, data_folder=data_folder, show=show, config=config)
     
-    # Figure 4 and S6
-    print("Generating Figure 4 and S6 (Magnitude CV)...")
+    # Figure 4 and S6 (Coherence heatmaps)
+    print("Generating Figure 4 and S6 (Coherence heatmaps)...")
     for season in ['dormant', 'growing']:
         generate_figure_4(season=season, data_folder=data_folder, show=show, config=config)
-    
+
     # Figure 5 and S7
-    print("Generating Figure 5 and S7 (Hydrologic response)...")
+    print("Generating Figure 5 and S7 (Magnitude CV)...")
     for season in ['dormant', 'growing']:
         generate_figure_5(season=season, data_folder=data_folder, show=show, config=config)
+
+    # Figure 6 and S8
+    print("Generating Figure 6 and S8 (Hydrologic response)...")
+    for season in ['dormant', 'growing']:
+        generate_figure_6(season=season, data_folder=data_folder, show=show, config=config)
     
     print("All figures generated!")
-

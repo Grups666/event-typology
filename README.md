@@ -16,16 +16,18 @@ figures_generation/
 ├── figures/                 # Generated static figures
 │   ├── Fig. 1/              # Regional catchment type maps (dormant season)
 │   ├── Fig. 2/              # Seasonal transition analysis
-│   ├── Fig. 3/              # Coherence-consistency heatmap (dormant)
-│   ├── Fig. 4/              # Magnitude CV vs coherency (dormant)
-│   ├── Fig. 5/              # Hydrologic response comparison
+│   ├── Fig. 3/              # Regional coherence map (dormant)
+│   ├── Fig. 4/              # Coherence-consistency heatmap (dormant)
+│   ├── Fig. 5/              # Magnitude CV vs coherency (dormant)
+│   ├── Fig. 6/              # Hydrologic response comparison
 │   ├── Fig. S1/             # SSI CDF
 │   ├── Fig. S2/             # Global catchment type maps
 │   ├── Fig. S3/             # Regional catchment type maps (growing season)
 │   ├── Fig. S4/             # Consistency boxplot
-│   ├── Fig. S5/             # Coherence-consistency heatmap (growing)
-│   ├── Fig. S6/             # Magnitude CV vs coherency (growing)
-│   └── Fig. S7/             # Hydrologic response comparison (growing)
+│   ├── Fig. S5/             # Regional coherence map (growing)
+│   ├── Fig. S6/             # Coherence-consistency heatmap (growing)
+│   ├── Fig. S7/             # Magnitude CV vs coherency (growing)
+│   └── Fig. S8/             # Hydrologic response comparison (growing)
 ├── interactive_maps/        # Interactive visualizations
 │   └── Global_Interactive_Map.html  # Global interactive catchment type map
 └── notebooks/
@@ -112,7 +114,8 @@ Event_Typology/
 │   └── Columns: GCIN, country, longitude, latitude, snow_fraction,
 │                KGE_calibration, KGE_evaluation, primary_event_type,
 │                secondary_event_type, event_type_with_percentiles,
-│                consistency_index, WI-Q_weekly, WI-Q_daily
+│                consistency_index, WI-Q_weekly, WI-Q_daily,
+│                spatial_pattern
 ├── metadata_growing.csv                # Metadata for growing season
 │   └── Same structure as metadata_dormant.csv
 ├── events_dormant.csv                  # Event-level data for dormant season
@@ -141,6 +144,7 @@ Event_Typology/
 - **event_type_with_percentiles**: Event type with percentage composition
 - **consistency_index**: Measure of consistency in event type classification
 - **WI-Q_weekly/daily**: Weekly and daily coherency indices
+- **spatial_pattern**: Spatial precipitation-pattern class used in spatial-pattern analyses
 - **soil_saturation_index**: Soil moisture saturation level
 - **event_magnitude_response_index**: Magnitude of hydrologic response
 
@@ -155,14 +159,17 @@ Event_Typology/
 - **Figure 2**: Seasonal transition analysis
   - Save path: `figures/Fig. 2/{region_name}_Seasonal_Transition.png`
 
-- **Figure 3**: Coherence-consistency heatmap (dormant season)
-  - Save path: `figures/Fig. 3/Heatmap_Coherence_Consistency_dormant.png`
+- **Figure 3**: Regional coherence map (dormant season)
+  - Save path: `figures/Fig. 3/Coherence_Map_dormant.png`
 
-- **Figure 4**: Magnitude CV vs coherency (dormant season)
-  - Save path: `figures/Fig. 4/Mag_CV_Vs_Coherency_dormant.png`
+- **Figure 4**: Coherence-consistency heatmap (dormant season)
+  - Save path: `figures/Fig. 4/Heatmap_Coherence_Consistency_dormant.png`
 
-- **Figure 5**: Hydrologic response comparison
-  - Save path: `figures/Fig. 5/Mag_Comparison_Combined_CDF.png`
+- **Figure 5**: Magnitude CV vs coherency (dormant season)
+  - Save path: `figures/Fig. 5/Mag_CV_Vs_Coherency_dormant.png`
+
+- **Figure 6**: Hydrologic response comparison
+  - Save path: `figures/Fig. 6/Mag_Comparison_Combined_CDF.png`
 
 ### Supplementary Figures
 
@@ -179,14 +186,17 @@ Event_Typology/
 - **Figure S4**: Consistency boxplot
   - Save path: `figures/Fig. S4/Consistency_Boxplot_{season}.png`
 
-- **Figure S5**: Coherence-consistency heatmap (growing season)
-  - Save path: `figures/Fig. S5/Heatmap_Coherence_Consistency_growing.png`
+- **Figure S5**: Regional coherence map (growing season)
+  - Save path: `figures/Fig. S5/Coherence_Map_growing.png`
 
-- **Figure S6**: Magnitude CV vs coherency (growing season)
-  - Save path: `figures/Fig. S6/Mag_CV_Vs_Coherency_growing.png`
+- **Figure S6**: Coherence-consistency heatmap (growing season)
+  - Save path: `figures/Fig. S6/Heatmap_Coherence_Consistency_growing.png`
 
-- **Figure S7**: Hydrologic response comparison (growing season)
-  - Save path: `figures/Fig. S7/Mag_Comparison_Combined_CDF.png`
+- **Figure S7**: Magnitude CV vs coherency (growing season)
+  - Save path: `figures/Fig. S7/Mag_CV_Vs_Coherency_growing.png`
+
+- **Figure S8**: Hydrologic response comparison (growing season)
+  - Save path: `figures/Fig. S8/Mag_Comparison_Combined_CDF.png`
 
 ## Configuration Parameters
 
@@ -214,9 +224,10 @@ Key parameters in `FigureConfig`:
 - `plot_ssi_cdf()`: Figure S1 - Soil Saturation Index CDF
 - `plot_catchment_type_maps()`: Figure 1/S2/S3 - Catchment type maps
 - `plot_seasonal_transition()`: Figure 2 - Seasonal transition analysis
-- `plot_coherence_consistency_heatmap()`: Figure 3/S5 - Heatmaps
-- `plot_magnitude_cv_vs_coherency()`: Figure 4/S6 - CV vs coherency
-- `plot_hydrologic_response_comparison()`: Figure 5/S7 - Response comparison
+- `plot_coherence_map_overview()`: Figure 3/S5 - Coherence maps
+- `plot_coherence_consistency_heatmap()`: Figure 4/S6 - Heatmaps
+- `plot_magnitude_cv_vs_coherency()`: Figure 5/S7 - CV vs coherency
+- `plot_hydrologic_response_comparison()`: Figure 6/S8 - Response comparison
 - `plot_distribution_by_axis()`: Distribution plots (helper)
 - `plot_type_change_pie()`: Pie chart (helper)
 - `plot_catchments_map()`: Base map plotting function
