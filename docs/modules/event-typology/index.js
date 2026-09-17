@@ -89,29 +89,35 @@ window.EventTypologyModule = class EventTypologyModule {
     if(this.selected!==null)this.inspect(this.selected);
     this.search();this.app.draw();
   }
+  markerRadius(vp) {
+    const worldScale=Math.min(1, vp.width/(2*vp.height));
+    const zoom=Math.max(1,vp.scale/worldScale);
+    return Math.min(8.5,2.5+1.3*Math.log2(zoom));
+  }
   render(ctx,vp) {
     const base=vp.height/180*vp.scale;
     const left=(-vp.width/2-vp.offsetX)/base,right=(vp.width/2-vp.offsetX)/base;
-    const radius=2*Math.max(2.2,Math.min(5,2+vp.scale*0.45));
+    const radius=this.markerRadius(vp);
     ctx.save();
     for(const row of this.rows||[]) {
-      const y=vp.height/2-row.latitude*base+vp.offsetY;if(y<-8||y>vp.height+8)continue;
+      const y=vp.height/2-row.latitude*base+vp.offsetY;if(y<-radius-3||y>vp.height+radius+3)continue;
       for(let seg=Math.ceil((left-row.longitude)/360);seg<=Math.floor((right-row.longitude)/360);seg++) {
         const x=vp.width/2+(row.longitude+seg*360)*base+vp.offsetX;
         if(this.metric==='type') {
-          ctx.beginPath();ctx.arc(x,y,radius+2.4,0,Math.PI*2);ctx.strokeStyle=this.ring(row);ctx.lineWidth=2.4;ctx.stroke();
-          ctx.beginPath();ctx.arc(x,y,radius-0.6,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
+          // Overlaid filled disks keep the secondary ring flush with the primary disk.
+          ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.ring(row);ctx.fill();
+          ctx.beginPath();ctx.arc(x,y,radius*0.68,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
         } else {
           ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
           ctx.strokeStyle='rgba(255,255,255,0.65)';ctx.lineWidth=0.4;ctx.stroke();
         }
-        if(row.GCIN===this.selected){ctx.beginPath();ctx.arc(x,y,radius+5.4,0,Math.PI*2);ctx.strokeStyle='#111';ctx.lineWidth=1.4;ctx.stroke();}
+        if(row.GCIN===this.selected){ctx.beginPath();ctx.arc(x,y,radius+2,0,Math.PI*2);ctx.strokeStyle='#111';ctx.lineWidth=1.4;ctx.stroke();}
       }
     }
     ctx.restore();
   }
   hit(lon,lat,vp) {
-    const base=vp.height/180*vp.scale;let best=null,dist=9*9;
+    const base=vp.height/180*vp.scale;let best=null,dist=Math.max(9,this.markerRadius(vp)+2)**2;
     for(const row of this.rows||[]) {
       const dx=(((lon-row.longitude+540)%360)-180)*base,dy=(lat-row.latitude)*base,d=dx*dx+dy*dy;
       if(d<dist){dist=d;best=row;}
