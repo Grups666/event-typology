@@ -1,0 +1,14 @@
+{
+  "Snow-Wet": "#0066CC",
+  "Snow-Mod": "#20a3ce",
+  "Snow-Dry": "#40E0D0",
+  "Rain-Wet": "#CC0000",
+  "Rain-Mod": "#FF6600",
+  "Rain-Dry": "#FFA500",
+  "ROS-Wet": "#6A0DAD",
+  "ROS-Mod": "#b43bb0",
+  "ROS-Dry": "#ff69b4",
+  "Mixed-Wet": "#666666",
+  "Mixed-Mod": "#666666",
+  "Mixed-Dry": "#666666"
+}

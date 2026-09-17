@@ -8,11 +8,14 @@ window.EventTypologyModule = class EventTypologyModule {
     this.country = '';
     this.consistent = false;
     this.selected = null;
-    this.colors = {'Rain-Dry':'#ffb52e','Rain-Mod':'#ff812f','Rain-Wet':'#eb332e','Snow-Dry':'#66dddb','Snow-Mod':'#46b9df','Snow-Wet':'#367cbc','ROS-Dry':'#ed83bb','ROS-Mod':'#b858c5','ROS-Wet':'#7432ba'};
+    this.colors = {};
     this.params = new URLSearchParams(location.search);
   }
   async onLoad() {
     const base = new URL(this.manifest.basePath || './modules/event-typology/', location.href);
+    const palette=await fetch(new URL('colors.json',base));
+    if(!palette.ok)throw new Error(`Catchment palette: ${palette.status}`);
+    this.colors=await palette.json();
     this.data = {};
     await Promise.all(['dormant','growing'].map(async season => {
       const res = await fetch(new URL(`${season}.json`, base));
@@ -94,12 +97,16 @@ window.EventTypologyModule = class EventTypologyModule {
     const zoom=Math.max(1,vp.scale/worldScale);
     return Math.min(10,2.5+1.6*Math.log2(zoom));
   }
+  orderedRows() {
+    const rows=this.rows||[];
+    return this.selected===null?rows:[...rows.filter(r=>r.GCIN!==this.selected),...rows.filter(r=>r.GCIN===this.selected)];
+  }
   render(ctx,vp) {
     const base=vp.height/180*vp.scale;
     const left=(-vp.width/2-vp.offsetX)/base,right=(vp.width/2-vp.offsetX)/base;
     const radius=this.markerRadius(vp);
     ctx.save();
-    for(const row of this.rows||[]) {
+    for(const row of this.orderedRows()) {
       const y=vp.height/2-row.latitude*base+vp.offsetY;if(y<-radius-3||y>vp.height+radius+3)continue;
       for(let seg=Math.ceil((left-row.longitude)/360);seg<=Math.floor((right-row.longitude)/360);seg++) {
         const x=vp.width/2+(row.longitude+seg*360)*base+vp.offsetX;
@@ -117,9 +124,14 @@ window.EventTypologyModule = class EventTypologyModule {
     ctx.restore();
   }
   hit(lon,lat,vp) {
-    const base=vp.height/180*vp.scale;let best=null,dist=Math.max(9,this.markerRadius(vp)+2)**2;
-    for(const row of this.rows||[]) {
-      const dx=(((lon-row.longitude+540)%360)-180)*base,dy=(lat-row.latitude)*base,d=dx*dx+dy*dy;
+    const base=vp.height/180*vp.scale,radius=this.markerRadius(vp);
+    let best=null,dist=Math.max(9,radius+2)**2;
+    const rows=this.orderedRows();
+    // The last-painted disk owns overlapping pixels; proximity is only a fallback.
+    for(let i=rows.length-1;i>=0;i--) {
+      const row=rows[i];
+      const dx=((((lon-row.longitude+180)%360+360)%360)-180)*base,dy=(lat-row.latitude)*base,d=dx*dx+dy*dy;
+      if(d<=radius*radius)return row;
       if(d<dist){dist=d;best=row;}
     }
     return best;
@@ -127,7 +139,7 @@ window.EventTypologyModule = class EventTypologyModule {
   inspect(id) {
     this.selected=id;
     const fmt=v=>v===null||v===undefined?'No data':Number(v).toFixed(3);
-    const d=this.byId.dormant.get(id),g=this.byId.growing.get(id),r=d||g;
+    const d=this.byId.dormant.get(id),g=this.byId.growing.get(id),r=this.byId[this.season].get(id)||d||g;
     const row=(title,key,format=fmt)=>`<tr><th>${title}</th><td>${d?format(d[key]):'No data'}</td><td>${g?format(g[key]):'No data'}</td></tr>`;
     this.app.showInspector(`GCIN ${id}`,`<h2>${this.escape(this.countryName(r.country))}</h2><p>${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}</p><table class="atlas-table"><thead><tr><th>Season</th><th>Dormant</th><th>Growing</th></tr></thead><tbody>${row('Primary type','primary_event_type',v=>this.escape(this.label(v)))}${row('Secondary type','secondary_event_type',v=>this.escape(this.label(v)))}${row('Consistency','consistency_index')}${row('Daily coherence','WI-Q_daily')}${row('Weekly coherence','WI-Q_weekly')}${row('Event composition (%)','event_type_with_percentiles',v=>this.escape(v).replace(/,/g,', '))}</tbody></table>`);
     const q=new URLSearchParams(location.search);q.set('gcin',id);history.replaceState(null,'',`${location.pathname}?${q}`);this.app.draw();

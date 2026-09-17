@@ -7,6 +7,7 @@ import math
 import shutil
 import subprocess
 from pathlib import Path
+from paper_symbols import paper_symbols
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--template', type=Path, required=True)
@@ -76,7 +77,12 @@ for season, expected in [('dormant', 4838), ('growing', 4797)]:
         assert row['longitude'] is not None and row['latitude'] is not None
         rows.append(row)
     assert len(rows) == expected and len({r['GCIN'] for r in rows}) == expected
+    coordinates, colors, geometry_source = paper_symbols(root, args.data, {r['GCIN'] for r in rows})
+    for row in rows:
+        row['longitude'], row['latitude'] = coordinates[row['GCIN']]
     (out / f'{season}.json').write_text(json.dumps(rows, separators=(',', ':'), allow_nan=False), encoding='utf-8')
+    (out / 'colors.json').write_text(json.dumps(colors, indent=2), encoding='utf-8')
     report['sources'][source.name] = {'sha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'catchments': len(rows)}
+    report.setdefault('map_coordinates', {})[season] = geometry_source
 (out / 'provenance.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
 print(json.dumps(report, indent=2))

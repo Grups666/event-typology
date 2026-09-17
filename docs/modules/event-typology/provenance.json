@@ -9,5 +9,79 @@
       "sha256": "ce5cc9765badd2c5d5bb4cf7c05dbf5029980c09df27b3af5c0339b4812139bc",
       "catchments": 4797
     }
+  },
+  "map_coordinates": {
+    "dormant": {
+      "file": "Gauged_Catchments_Boundaries.gpkg",
+      "sha256": "24c2c9244033cac35546873f7d5cd60bb0027d4707180a1ecb69355002e045b5",
+      "method": "AlbersEqualArea polygon centroid; projection centered on each manuscript region bounding box",
+      "regions": {
+        "oceania": {
+          "catchments": 226,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=146.9010521275 +lat_0=-28.91354164999996 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "southern_africa": {
+          "catchments": 320,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=28.9357198 +lat_0=-19.56243489999999 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "europe": {
+          "catchments": 2102,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=4.397916799999998 +lat_0=50.1015496 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "north_america": {
+          "catchments": 1353,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=-104.1252712323511 +lat_0=38.43520834999995 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "south_america": {
+          "catchments": 695,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=-57.51712902968796 +lat_0=-21.34655466111111 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "southeast_asia": {
+          "catchments": 55,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=107.6129903 +lat_0=9.471934000000001 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "globe": {
+          "catchments": 4838,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=11.22604580000001 +lat_0=4.232638888888847 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs",
+          "used_for_catchments": 87
+        }
+      }
+    },
+    "growing": {
+      "file": "Gauged_Catchments_Boundaries.gpkg",
+      "sha256": "24c2c9244033cac35546873f7d5cd60bb0027d4707180a1ecb69355002e045b5",
+      "method": "AlbersEqualArea polygon centroid; projection centered on each manuscript region bounding box",
+      "regions": {
+        "oceania": {
+          "catchments": 226,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=146.9010521275 +lat_0=-28.91354164999996 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "southern_africa": {
+          "catchments": 319,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=28.9357198 +lat_0=-19.36842039999999 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "europe": {
+          "catchments": 2073,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=4.397916799999998 +lat_0=50.1015496 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "north_america": {
+          "catchments": 1352,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=-104.1252712323511 +lat_0=38.43520834999995 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "south_america": {
+          "catchments": 691,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=-57.51712902968796 +lat_0=-21.34655466111111 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "southeast_asia": {
+          "catchments": 55,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=107.6129903 +lat_0=9.471934000000001 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs"
+        },
+        "globe": {
+          "catchments": 4797,
+          "projection": "+ellps=WGS84 +proj=aea +lon_0=11.22604580000001 +lat_0=4.232638888888847 +x_0=0.0 +y_0=0.0 +lat_1=20.0 +lat_2=50.0 +no_defs",
+          "used_for_catchments": 81
+        }
+      }
+    }
   }
 }
