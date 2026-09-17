@@ -17,6 +17,9 @@ primary type; outer rings show the secondary type for compound classifications,
 or gray when its stored percentage is below 25, matching the original plotter.
 Single-type classifications use the same color for the center and outer ring.
 Both types and the original composition are available in the inspector.
+The only thematic map is hydro-meteorological type. Consistency and daily/weekly
+coherence remain available in each catchment's inspector and CSV download.
+Optional outline layers and the layer controls are not exposed in this atlas.
 The optional high-consistency filter uses the strict CI > 0.9 criterion.
 CSV downloads contain the currently filtered seasonal records.
 

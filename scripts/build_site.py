@@ -22,6 +22,12 @@ html = html.replace('</head>', '<link rel="stylesheet" href="./atlas.css">\n</he
 html = html.replace('staticModules: [],', 'staticModules: [{id: "event-typology", name: "Event Typology", defaultLoad: true}],')
 html = html.replace('return 180 / this.getWorldLatitudeSpan();', 'return Math.min(180 / this.getWorldLatitudeSpan(), 180 * this.viewport.width / (360 * this.viewport.height));')
 html = html.replace('viewport: { width: 0, height: 0, scale: 1, offsetX: 0, offsetY: 0 }', 'viewport: { width: 0, height: 0, scale: 0, offsetX: 0, offsetY: 0 }')
+html = html.replace("        window.addEventListener('resize', () => this.resize());", """        window.addEventListener('resize', () => this.resize());
+        this.mapResizeObserver = new ResizeObserver(() => {
+          const rect = this.canvas.parentElement.getBoundingClientRect();
+          if (rect.width !== this.viewport.width || rect.height !== this.viewport.height) this.resize();
+        });
+        this.mapResizeObserver.observe(this.canvas.parentElement);""")
 html = html.replace('`${lon.toFixed(1)} deg, ${lat.toFixed(1)} deg`', 'Math.abs(lat) > 90 ? "--" : `${(((lon + 180) % 360 + 360) % 360 - 180).toFixed(1)} deg, ${lat.toFixed(1)} deg`')
 # Keep the graticule and layers inside real geographic latitude bounds.
 html = html.replace('        // Background\n', '''        ctx.fillStyle = this.themeStyle === 'dark' ? '#18212b' : '#ffffff';
@@ -55,6 +61,10 @@ html = html[:basemap_start] + basemap + html[basemap_end:]
 start = html.index('      async fetchModules() {')
 end = html.index('      async loadDefaultModules()', start)
 html = html[:start] + '      async fetchModules() { this.modules = this.staticModules; this.updateModuleList(); },\n\n' + html[end:]
+start = html.index("        this.layerManager.addLayer({\n          id: 'outlines-countries'")
+end = html.index('        // Setup interactions', start)
+html = html[:start] + html[end:]
+html = html.replace('    <script src="./assets/basin-data.js"></script>', '')
 html = html.replace('<div class="panel-main">', '<div class="panel-main"><section id="atlasControls" class="atlas-controls"><h1>Event Typology</h1><p role="status">Loading catchment data...</p></section>')
 html = html.replace('App.init();', 'App.init().catch(error => { document.getElementById("atlasControls").textContent = "Unable to load atlas. Please reload the page."; console.error(error); });')
 (site / 'index.html').write_text(html.rstrip() + '\n', encoding='utf-8')

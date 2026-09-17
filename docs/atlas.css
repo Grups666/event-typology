@@ -29,9 +29,12 @@ body.theme-dark .atlas-controls .subtitle {color:#bacbc1;}
 body.theme-dark .atlas-controls a {color:#9cddbb;}
 .atlas-download {display:block; margin-top:16px; color:#246349;}
 .atlas-controls ~ .panel-section:has(#moduleList) {display:none;}
+.panel-section:has(#layerList) {display:none;}
 .panel-bottom {max-height:34vh; overflow:auto;}
 .map-area {left:260px;}
 .map-status {left:276px; max-width:calc(100vw - 300px); flex-wrap:wrap;}
+body:has(#leftPanel.hidden) .map-area {left:0;}
+body:has(#leftPanel.hidden) .map-status {left:16px; max-width:calc(100vw - 32px);}
 .atlas-controls .error {color:#a52121;}
 @media(max-width:700px) {
  .map-area {left:0;}

@@ -24,22 +24,18 @@ window.EventTypologyModule = class EventTypologyModule {
     }));
     this.byId = Object.fromEntries(Object.entries(this.data).map(([s,rows]) => [s,new Map(rows.map(r => [r.GCIN,r]))]));
     this.season = this.params.get('season') === 'growing' ? 'growing' : 'dormant';
-    this.metric = ['type','daily','weekly','consistency'].includes(this.params.get('metric')) ? this.params.get('metric') : 'type';
     const countries = [...new Set(this.data.dormant.map(r => r.country))].sort();
     this.country = countries.includes(this.params.get('country')) ? this.params.get('country') : '';
     this.consistent = this.params.get('ci') === 'high';
     document.getElementById('atlasControls').innerHTML = `
       <h1>Event Typology</h1><p class="subtitle">Global catchment atlas<br>Ying Yan, Hamed Sharif &amp; Ali A. Ameli</p>
       <div class="seasons" aria-label="Season"><button data-season="dormant">Dormant</button><button data-season="growing">Growing</button></div>
-      <label for="atlasMetric">Map</label><select id="atlasMetric"><option value="type">Hydro-meteorological type</option><option value="daily">WI-Q coherence at daily band</option><option value="weekly">WI-Q coherence at weekly band</option><option value="consistency">Event-type consistency</option></select>
       <label for="atlasCountry">Country</label><select id="atlasCountry"><option value="">All countries</option>${countries.map(c=>`<option value="${c}">${this.countryName(c)}</option>`).join('')}</select>
       <label class="check"><input id="atlasCI" type="checkbox"> High consistency (CI &gt; 0.9)</label>
       <label for="atlasSearch">Catchment GCIN</label><input id="atlasSearch" type="search" inputmode="numeric" placeholder="Search GCIN" autocomplete="off"><div class="atlas-results" id="atlasResults"></div>
       <p class="atlas-count" id="atlasCount" role="status"></p>
       <div class="links"><a href="https://doi.org/10.1038/s43247-026-04079-6" target="_blank" rel="noopener">Paper</a><a href="https://github.com/Grups666/event-typology" target="_blank" rel="noopener">Code</a><a href="#" id="atlasDownload">CSV</a></div>`;
     document.querySelectorAll('[data-season]').forEach(b => b.onclick = () => {this.season=b.dataset.season; this.update();});
-    document.getElementById('atlasMetric').value=this.metric;
-    document.getElementById('atlasMetric').onchange=e=>{this.metric=e.target.value;this.update();};
     document.getElementById('atlasCountry').value=this.country;
     document.getElementById('atlasCountry').onchange=e=>{this.country=e.target.value;this.update();this.fitCountry();};
     document.getElementById('atlasCI').checked=this.consistent;
@@ -65,27 +61,21 @@ window.EventTypologyModule = class EventTypologyModule {
     const [type,percent]=parts[1].split(':');
     return Number(percent)>=25?(this.colors[type]||'#666666'):'#666666';
   }
-  value(row) {return row[{daily:'WI-Q_daily',weekly:'WI-Q_weekly',consistency:'consistency_index'}[this.metric]];}
   color(row) {
-    if(this.metric==='type')return this.colors[row.primary_event_type]||'#888888';
-    const v=this.value(row);if(v===null||v===undefined)return '#999999';
-    const stops=[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]];
-    const t=Math.max(0,Math.min(1,v))*4,i=Math.min(3,Math.floor(t)),f=t-i;
-    return `rgb(${stops[i].map((c,k)=>Math.round(c+(stops[i+1][k]-c)*f)).join(',')})`;
+    return this.colors[row.primary_event_type]||'#888888';
   }
   update() {
     this.rows=this.data[this.season].filter(r=>(!this.country||r.country===this.country)&&(!this.consistent||r.consistency_index>0.9));
     document.querySelectorAll('[data-season]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.season===this.season)));
-    const missing=this.metric==='type'?0:this.rows.filter(r=>this.value(r)===null).length;
-    document.getElementById('atlasCount').textContent=`${this.rows.length.toLocaleString()} / ${this.data[this.season].length.toLocaleString()} catchments${missing?` · ${missing} missing values`:''}`;
+    document.getElementById('atlasCount').textContent=`${this.rows.length.toLocaleString()} / ${this.data[this.season].length.toLocaleString()} catchments`;
     let html;
     if(this.metric==='type') {
       const types=[...new Set(this.rows.flatMap(r=>[r.primary_event_type,...String(r.event_type_with_percentiles||'').split(' & ').slice(1).filter(p=>Number(p.split(':')[1])>=25).map(p=>p.split(':')[0])]))];
       const ordered=[...Object.keys(this.colors),...types.filter(t=>!this.colors[t])].filter(t=>types.includes(t));
       html=`<div class="atlas-legend">${ordered.map(t=>`<span class="atlas-swatch" style="background:${this.colors[t]||'#888'}"></span><span>${this.escape(this.label(t))}</span>`).join('')}</div>`;
       html+='<div class="atlas-ring-key"><span class="atlas-ring-symbol"></span><span>Inner: primary type<br>Outer: secondary type<br>Gray outer: secondary &lt; 25%</span></div>';
-    } else html='<div class="atlas-scale"></div><div class="atlas-ticks"><span>0</span><span>0.5</span><span>1</span></div>'+(missing?'<p>Gray: no value</p>':'');
-    this.app.registerLegend(this.id,{title:document.getElementById('atlasMetric').selectedOptions[0].textContent,html});
+    }
+    this.app.registerLegend(this.id,{title:'Hydro-meteorological type',html});
     const query=new URLSearchParams(location.search);query.set('season',this.season);query.set('metric',this.metric);
     this.country?query.set('country',this.country):query.delete('country');this.consistent?query.set('ci','high'):query.delete('ci');
     history.replaceState(null,'',`${location.pathname}?${query}`);
@@ -114,9 +104,6 @@ window.EventTypologyModule = class EventTypologyModule {
           // Overlaid filled disks keep the secondary ring flush with the primary disk.
           ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.ring(row);ctx.fill();
           ctx.beginPath();ctx.arc(x,y,radius*0.68,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
-        } else {
-          ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
-          ctx.strokeStyle='rgba(255,255,255,0.65)';ctx.lineWidth=0.4;ctx.stroke();
         }
         if(row.GCIN===this.selected){ctx.beginPath();ctx.arc(x,y,radius+2,0,Math.PI*2);ctx.strokeStyle='#111';ctx.lineWidth=1.4;ctx.stroke();}
       }

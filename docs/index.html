@@ -914,7 +914,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="./assets/basin-data.js"></script>
+
     <script src="./assets/land-50m.js"></script>
     <script src="./assets/country-polygons-110m.js"></script>
 
@@ -1026,32 +1026,6 @@
           renderer: (ctx, layer, vp) => this.renderBasemap(ctx, vp)
         });
 
-        this.layerManager.addLayer({
-          id: 'outlines-countries',
-          name: 'Countries',
-          type: 'vector',
-          visible: false,
-          interactive: true,
-          moduleId: 'foundation',
-          groupPath: ['outlines', 'countries'],
-          renderer: (ctx, layer, vp) => this.renderCountryOutlines(ctx, vp),
-          hitTest: (lon, lat, vp, layer) => this.hitTestCountryOutlines(lon, lat, vp)
-        });
-
-        // Add basin layer under Outlines > Basins. This single third-level layer owns
-        // both basin rendering and basin click/hover interaction.
-        this.layerManager.addLayer({
-          id: 'outlines-basins',
-          name: 'Basins',
-          type: 'vector',
-          visible: false,
-          interactive: true,
-          moduleId: 'foundation',
-          groupPath: ['outlines', 'basins'],
-          renderer: (ctx, layer, vp) => this.renderBasinsLayer(ctx, vp),
-          hitTest: (lon, lat, vp, layer) => this.hitTestBasins(lon, lat)
-        });
-
         // Setup interactions
         this.setupCanvasEvents();
         this.setupUI();
@@ -1067,6 +1041,11 @@
         await this.loadDefaultModules();
         await this.loadUrlModules();
         window.addEventListener('resize', () => this.resize());
+        this.mapResizeObserver = new ResizeObserver(() => {
+          const rect = this.canvas.parentElement.getBoundingClientRect();
+          if (rect.width !== this.viewport.width || rect.height !== this.viewport.height) this.resize();
+        });
+        this.mapResizeObserver.observe(this.canvas.parentElement);
       },
 
       // Canvas bounding rect (updated on resize)
