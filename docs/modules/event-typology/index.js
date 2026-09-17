@@ -55,6 +55,13 @@ window.EventTypologyModule = class EventTypologyModule {
   countryName(c) {try{return new Intl.DisplayNames(['en'],{type:'region'}).of(c);}catch{return c;}}
   escape(s) {return this.app.escape(s);}
   label(s) {return String(s||'Unclassified').replace(/-Mod\b/g,'-Moderate');}
+  ring(row) {
+    // Match the paper plotter using the exported classification, not rounded CI.
+    const parts=String(row.event_type_with_percentiles||'').split(' & ');
+    if(parts.length<2)return this.colors[row.primary_event_type]||'#888888';
+    const [type,percent]=parts[1].split(':');
+    return Number(percent)>=25?(this.colors[type]||'#666666'):'#666666';
+  }
   value(row) {return row[{daily:'WI-Q_daily',weekly:'WI-Q_weekly',consistency:'consistency_index'}[this.metric]];}
   color(row) {
     if(this.metric==='type')return this.colors[row.primary_event_type]||'#888888';
@@ -70,9 +77,10 @@ window.EventTypologyModule = class EventTypologyModule {
     document.getElementById('atlasCount').textContent=`${this.rows.length.toLocaleString()} / ${this.data[this.season].length.toLocaleString()} catchments${missing?` · ${missing} missing values`:''}`;
     let html;
     if(this.metric==='type') {
-      const types=[...new Set(this.rows.map(r=>r.primary_event_type))];
+      const types=[...new Set(this.rows.flatMap(r=>[r.primary_event_type,...String(r.event_type_with_percentiles||'').split(' & ').slice(1).filter(p=>Number(p.split(':')[1])>=25).map(p=>p.split(':')[0])]))];
       const ordered=[...Object.keys(this.colors),...types.filter(t=>!this.colors[t])].filter(t=>types.includes(t));
       html=`<div class="atlas-legend">${ordered.map(t=>`<span class="atlas-swatch" style="background:${this.colors[t]||'#888'}"></span><span>${this.escape(this.label(t))}</span>`).join('')}</div>`;
+      html+='<div class="atlas-ring-key"><span class="atlas-ring-symbol"></span><span>Inner: primary type<br>Outer: secondary type<br>Gray outer: secondary &lt; 25%</span></div>';
     } else html='<div class="atlas-scale"></div><div class="atlas-ticks"><span>0</span><span>0.5</span><span>1</span></div>'+(missing?'<p>Gray: no value</p>':'');
     this.app.registerLegend(this.id,{title:document.getElementById('atlasMetric').selectedOptions[0].textContent,html});
     const query=new URLSearchParams(location.search);query.set('season',this.season);query.set('metric',this.metric);
@@ -90,8 +98,14 @@ window.EventTypologyModule = class EventTypologyModule {
       const y=vp.height/2-row.latitude*base+vp.offsetY;if(y<-8||y>vp.height+8)continue;
       for(let seg=Math.ceil((left-row.longitude)/360);seg<=Math.floor((right-row.longitude)/360);seg++) {
         const x=vp.width/2+(row.longitude+seg*360)*base+vp.offsetX;
-        ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
-        ctx.strokeStyle=row.GCIN===this.selected?'#111':'rgba(255,255,255,0.65)';ctx.lineWidth=row.GCIN===this.selected?2:0.4;ctx.stroke();
+        if(this.metric==='type') {
+          ctx.beginPath();ctx.arc(x,y,radius+1.2,0,Math.PI*2);ctx.strokeStyle=this.ring(row);ctx.lineWidth=1.2;ctx.stroke();
+          ctx.beginPath();ctx.arc(x,y,radius-0.3,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
+        } else {
+          ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
+          ctx.strokeStyle='rgba(255,255,255,0.65)';ctx.lineWidth=0.4;ctx.stroke();
+        }
+        if(row.GCIN===this.selected){ctx.beginPath();ctx.arc(x,y,radius+2.7,0,Math.PI*2);ctx.strokeStyle='#111';ctx.lineWidth=1.4;ctx.stroke();}
       }
     }
     ctx.restore();

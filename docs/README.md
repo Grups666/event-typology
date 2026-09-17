@@ -8,8 +8,11 @@ The map displays catchment representative locations, not catchment boundaries.
 Dormant-season data contain 4,838 catchments; growing-season data contain 4,797.
 Missing seasonal records and coherence values are never replaced with zero.
 Event types and coherence are read from the manuscript metadata without recalculation.
-The type map shows the primary event type; both primary and secondary types and
-the original percentage composition are available in the catchment inspector.
+The type map reproduces the paper's concentric symbols. Inner circles show the
+primary type; outer rings show the secondary type for compound classifications,
+or gray when its stored percentage is below 25, matching the original plotter.
+Single-type classifications use the same color for the center and outer ring.
+Both types and the original composition are available in the inspector.
 The optional high-consistency filter uses the strict CI > 0.9 criterion.
 CSV downloads contain the currently filtered seasonal records.
 
