@@ -1103,7 +1103,7 @@
         this.canvas.addEventListener('mousemove', (e) => {
           const { x, y } = this.getCanvasCoords(e);
           const { lon, lat } = this.screenToGeo(x, y);
-          document.getElementById('statusCoords').textContent = `${lon.toFixed(1)} deg, ${lat.toFixed(1)} deg`;
+          document.getElementById('statusCoords').textContent = Math.abs(lat) > 90 ? "--" : `${(((lon + 180) % 360 + 360) % 360 - 180).toFixed(1)} deg, ${lat.toFixed(1)} deg`;
 
           if (this.dragging) {
             const moved = Math.abs(x - this.dragStart.x) + Math.abs(y - this.dragStart.y);
@@ -1779,6 +1779,14 @@
         viewport.interacting = !!renderState.interacting;
         const theme = this.getCurrentMapStyle();
 
+        ctx.fillStyle = this.themeStyle === 'dark' ? '#18212b' : '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.save();
+        const northY = height / 2 - 90 * this.getBaseScale() + viewport.offsetY;
+        const southY = height / 2 + 90 * this.getBaseScale() + viewport.offsetY;
+        ctx.beginPath();
+        ctx.rect(0, northY, width, southY - northY);
+        ctx.clip();
         // Background
         const grad = ctx.createLinearGradient(0, 0, 0, height);
         grad.addColorStop(0, theme.background[0]);
@@ -1819,6 +1827,7 @@
             layer.renderer(ctx, layer, viewport);
           }
         }
+        ctx.restore();
         viewport.interacting = false;
       },
 
@@ -1850,7 +1859,18 @@
                 else path.lineTo(x, y);
               }
             if (!this.imageryEnabled && style.landFill) ctx.fill(path);
-            ctx.stroke(path);
+            const coast = new Path2D();
+            for (let i = 0; i < ring.length; i++) {
+              const [lon, lat] = ring[i];
+              const previous = ring[Math.max(0, i - 1)];
+              const closure = lat <= -89.99 || previous[1] <= -89.99 ||
+                (Math.abs(lon) >= 179.99 && Math.abs(previous[0]) >= 179.99);
+              const x = width / 2 + (lon + lonOffset) * base + offsetX;
+              const y = height / 2 - lat * base + offsetY;
+              if (i === 0 || closure) coast.moveTo(x, y);
+              else coast.lineTo(x, y);
+            }
+            ctx.stroke(coast);
           }
         }
       },

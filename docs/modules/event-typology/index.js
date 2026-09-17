@@ -92,20 +92,20 @@ window.EventTypologyModule = class EventTypologyModule {
   render(ctx,vp) {
     const base=vp.height/180*vp.scale;
     const left=(-vp.width/2-vp.offsetX)/base,right=(vp.width/2-vp.offsetX)/base;
-    const radius=Math.max(2.2,Math.min(5,2+vp.scale*0.45));
+    const radius=2*Math.max(2.2,Math.min(5,2+vp.scale*0.45));
     ctx.save();
     for(const row of this.rows||[]) {
       const y=vp.height/2-row.latitude*base+vp.offsetY;if(y<-8||y>vp.height+8)continue;
       for(let seg=Math.ceil((left-row.longitude)/360);seg<=Math.floor((right-row.longitude)/360);seg++) {
         const x=vp.width/2+(row.longitude+seg*360)*base+vp.offsetX;
         if(this.metric==='type') {
-          ctx.beginPath();ctx.arc(x,y,radius+1.2,0,Math.PI*2);ctx.strokeStyle=this.ring(row);ctx.lineWidth=1.2;ctx.stroke();
-          ctx.beginPath();ctx.arc(x,y,radius-0.3,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
+          ctx.beginPath();ctx.arc(x,y,radius+2.4,0,Math.PI*2);ctx.strokeStyle=this.ring(row);ctx.lineWidth=2.4;ctx.stroke();
+          ctx.beginPath();ctx.arc(x,y,radius-0.6,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
         } else {
           ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fillStyle=this.color(row);ctx.fill();
           ctx.strokeStyle='rgba(255,255,255,0.65)';ctx.lineWidth=0.4;ctx.stroke();
         }
-        if(row.GCIN===this.selected){ctx.beginPath();ctx.arc(x,y,radius+2.7,0,Math.PI*2);ctx.strokeStyle='#111';ctx.lineWidth=1.4;ctx.stroke();}
+        if(row.GCIN===this.selected){ctx.beginPath();ctx.arc(x,y,radius+5.4,0,Math.PI*2);ctx.strokeStyle='#111';ctx.lineWidth=1.4;ctx.stroke();}
       }
     }
     ctx.restore();

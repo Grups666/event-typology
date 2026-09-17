@@ -21,6 +21,36 @@ html = html.replace('</head>', '<link rel="stylesheet" href="./atlas.css">\n</he
 html = html.replace('staticModules: [],', 'staticModules: [{id: "event-typology", name: "Event Typology", defaultLoad: true}],')
 html = html.replace('return 180 / this.getWorldLatitudeSpan();', 'return Math.min(180 / this.getWorldLatitudeSpan(), 180 * this.viewport.width / (360 * this.viewport.height));')
 html = html.replace('viewport: { width: 0, height: 0, scale: 1, offsetX: 0, offsetY: 0 }', 'viewport: { width: 0, height: 0, scale: 0, offsetX: 0, offsetY: 0 }')
+html = html.replace('`${lon.toFixed(1)} deg, ${lat.toFixed(1)} deg`', 'Math.abs(lat) > 90 ? "--" : `${(((lon + 180) % 360 + 360) % 360 - 180).toFixed(1)} deg, ${lat.toFixed(1)} deg`')
+# Keep the graticule and layers inside real geographic latitude bounds.
+html = html.replace('        // Background\n', '''        ctx.fillStyle = this.themeStyle === 'dark' ? '#18212b' : '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.save();
+        const northY = height / 2 - 90 * this.getBaseScale() + viewport.offsetY;
+        const southY = height / 2 + 90 * this.getBaseScale() + viewport.offsetY;
+        ctx.beginPath();
+        ctx.rect(0, northY, width, southY - northY);
+        ctx.clip();
+        // Background
+''')
+html = html.replace('        viewport.interacting = false;', '        ctx.restore();\n        viewport.interacting = false;')
+# Polar and antimeridian polygon closures are not physical coastlines.
+basemap_start = html.index('      renderBasemap(ctx, viewport) {')
+basemap_end = html.index('      renderRasterTiles(', basemap_start)
+basemap = html[basemap_start:basemap_end]
+basemap = basemap.replace('            ctx.stroke(path);', '''            const coast = new Path2D();
+            for (let i = 0; i < ring.length; i++) {
+              const [lon, lat] = ring[i];
+              const previous = ring[Math.max(0, i - 1)];
+              const closure = lat <= -89.99 || previous[1] <= -89.99 ||
+                (Math.abs(lon) >= 179.99 && Math.abs(previous[0]) >= 179.99);
+              const x = width / 2 + (lon + lonOffset) * base + offsetX;
+              const y = height / 2 - lat * base + offsetY;
+              if (i === 0 || closure) coast.moveTo(x, y);
+              else coast.lineTo(x, y);
+            }
+            ctx.stroke(coast);''')
+html = html[:basemap_start] + basemap + html[basemap_end:]
 start = html.index('      async fetchModules() {')
 end = html.index('      async loadDefaultModules()', start)
 html = html[:start] + '      async fetchModules() { this.modules = this.staticModules; this.updateModuleList(); },\n\n' + html[end:]
