@@ -1,4 +1,21 @@
-# Figures Generation Module
+# Event Typology
+
+## Interactive Atlas
+
+Explore the paper's seasonal catchment classifications and hydrologic coherence:
+
+**https://grups666.github.io/event-typology/**
+
+The atlas uses the [Tereon](https://github.com/Grups666/tereon) map foundation.
+Switch seasons and map variables, filter by country or event-type consistency,
+search catchment GCINs, compare seasonal values, and download filtered metadata.
+The current manuscript data contain 4,838 dormant-season and 4,797 growing-season
+catchments. The previous Kepler export in `interactive_maps/` is retained as an
+archive; use the atlas above for the current manuscript data.
+
+See [site documentation](docs/README.md) for data provenance and rebuilding.
+
+## Figures Generation Module
 
 This module provides a modular and configurable approach to generating all figures for the paper. The code has been refactored from the original notebook into a clean, reusable structure.
 

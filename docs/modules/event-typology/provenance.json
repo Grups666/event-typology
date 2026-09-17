@@ -1,0 +1,13 @@
+{
+  "template_commit": "23ff125fae31f47d754b8fa4bb97aeaa0c910fc3",
+  "sources": {
+    "metadata_dormant.csv": {
+      "sha256": "5d63b7913df540969cc467de6c1c5e690ea64d67b95506c7ec082cda81951fc0",
+      "catchments": 4838
+    },
+    "metadata_growing.csv": {
+      "sha256": "ce5cc9765badd2c5d5bb4cf7c05dbf5029980c09df27b3af5c0339b4812139bc",
+      "catchments": 4797
+    }
+  }
+}

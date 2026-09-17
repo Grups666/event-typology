@@ -1,0 +1,40 @@
+.atlas-controls {padding:18px 16px; border-bottom:1px solid #ddd;}
+.atlas-controls h1 {font-size:22px; margin:0 0 6px; color:#24352d; letter-spacing:0;}
+.atlas-controls .subtitle {color:#65736b; font-size:12px; line-height:1.5; margin-bottom:16px;}
+.atlas-controls label {display:block; font-weight:600; margin:14px 0 5px;}
+.atlas-controls select,.atlas-controls input[type=search] {width:100%; min-height:34px; border:1px solid #ccd2ce; border-radius:4px; padding:6px 8px; background:white; color:#263b30;}
+.atlas-controls .seasons {display:flex; gap:0; border:1px solid #81998a; border-radius:4px; overflow:hidden;}
+.seasons button {flex:1; padding:8px 4px; border:0; cursor:pointer; background:white; color:#254431;}
+.seasons button[aria-pressed=true] {background:#295b41; color:white;}
+.atlas-controls .check {display:flex; align-items:center; gap:8px; font-weight:400;}
+.atlas-controls .links {display:flex; gap:16px; margin-top:16px;}
+.atlas-controls a {color:#246349; text-decoration:underline;}
+.atlas-count {margin-top:12px; color:#53645b; font-variant-numeric:tabular-nums;}
+.atlas-results {max-height:160px; overflow:auto; margin-top:4px;}
+.atlas-results button {display:block; text-align:left; width:100%; padding:7px; background:#fff; border:0; border-bottom:1px solid #eee; cursor:pointer;}
+.atlas-results button:hover {background:#e3eee7;}
+.atlas-legend {display:grid; grid-template-columns:12px 1fr; gap:6px 8px; align-items:center; font-size:12px;}
+.atlas-swatch {height:10px; width:10px; border-radius:50%;}
+.atlas-scale {height:12px; background:linear-gradient(to right,#440154,#3b528b,#21918c,#5ec962,#fde725);}
+.atlas-ticks {display:flex; justify-content:space-between; margin-top:4px;}
+.atlas-table {width:100%; border-collapse:collapse; font-size:12px;}
+.atlas-table th,.atlas-table td {padding:10px 5px; border-bottom:1px solid #dce3df; text-align:left; vertical-align:top;}
+.atlas-table th {font-weight:500;}
+.atlas-table {table-layout:fixed; overflow-wrap:anywhere;}
+.atlas-controls button {font-family:inherit;}
+body.theme-dark .atlas-controls h1,body.theme-dark .atlas-count {color:#e1ece6;}
+body.theme-dark .atlas-controls .subtitle {color:#bacbc1;}
+body.theme-dark .atlas-controls a {color:#9cddbb;}
+.atlas-download {display:block; margin-top:16px; color:#246349;}
+.atlas-controls ~ .panel-section:has(#moduleList) {display:none;}
+.panel-bottom {max-height:34vh; overflow:auto;}
+.map-area {left:260px;}
+.map-status {left:276px; max-width:calc(100vw - 300px); flex-wrap:wrap;}
+.atlas-controls .error {color:#a52121;}
+@media(max-width:700px) {
+ .map-area {left:0;}
+ .left-panel {width:min(280px,85vw);}
+ .map-status {left:8px; max-width:calc(100vw - 16px); font-size:10px;}
+ .inspector-panel {width:min(340px,calc(100vw - 24px)); max-height:65vh; right:12px;}
+ .panel-bottom {max-height:30vh;}
+}

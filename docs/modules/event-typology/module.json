@@ -1,0 +1,8 @@
+{
+  "id": "event-typology",
+  "name": "Event Typology",
+  "version": "1.0.0",
+  "entry": "./index.js",
+  "className": "EventTypologyModule",
+  "description": "Seasonal hydro-meteorological event types and WI-Q coherence."
+}
