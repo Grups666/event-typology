@@ -92,7 +92,7 @@ window.EventTypologyModule = class EventTypologyModule {
   markerRadius(vp) {
     const worldScale=Math.min(1, vp.width/(2*vp.height));
     const zoom=Math.max(1,vp.scale/worldScale);
-    return Math.min(8.5,2.5+1.3*Math.log2(zoom));
+    return Math.min(10,2.5+1.6*Math.log2(zoom));
   }
   render(ctx,vp) {
     const base=vp.height/180*vp.scale;
