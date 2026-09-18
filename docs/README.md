@@ -16,7 +16,8 @@ The type map reproduces the paper's concentric symbols. Inner circles show the
 primary type; outer rings show the secondary type for compound classifications,
 or gray when its stored percentage is below 25, matching the original plotter.
 Single-type classifications use the same color for the center and outer ring.
-Both types and the original composition are available in the inspector.
+Both types are available in the inspector; the original composition is retained
+in the data for symbol rendering and CSV export.
 The only thematic map is hydro-meteorological type. Consistency and daily/weekly
 coherence remain available in each catchment's inspector and CSV download.
 Optional outline layers and the layer controls are not exposed in this atlas.

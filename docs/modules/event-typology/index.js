@@ -128,7 +128,7 @@ window.EventTypologyModule = class EventTypologyModule {
     const fmt=v=>v===null||v===undefined?'No data':Number(v).toFixed(3);
     const d=this.byId.dormant.get(id),g=this.byId.growing.get(id),r=this.byId[this.season].get(id)||d||g;
     const row=(title,key,format=fmt)=>`<tr><th>${title}</th><td>${d?format(d[key]):'No data'}</td><td>${g?format(g[key]):'No data'}</td></tr>`;
-    this.app.showInspector(`GCIN ${id}`,`<h2>${this.escape(this.countryName(r.country))}</h2><p>${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}</p><table class="atlas-table"><thead><tr><th>Season</th><th>Dormant</th><th>Growing</th></tr></thead><tbody>${row('Primary type','primary_event_type',v=>this.escape(this.label(v)))}${row('Secondary type','secondary_event_type',v=>this.escape(this.label(v)))}${row('Consistency','consistency_index')}${row('Daily coherence','WI-Q_daily')}${row('Weekly coherence','WI-Q_weekly')}${row('Event composition (%)','event_type_with_percentiles',v=>this.escape(v).replace(/,/g,', '))}</tbody></table>`);
+    this.app.showInspector(`GCIN ${id}`,`<h2>${this.escape(this.countryName(r.country))}</h2><p>${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}</p><table class="atlas-table"><thead><tr><th>Season</th><th>Dormant</th><th>Growing</th></tr></thead><tbody>${row('Primary type','primary_event_type',v=>this.escape(this.label(v)))}${row('Secondary type','secondary_event_type',v=>this.escape(this.label(v)))}${row('Consistency','consistency_index')}${row('Daily coherence','WI-Q_daily')}${row('Weekly coherence','WI-Q_weekly')}</tbody></table>`);
     const q=new URLSearchParams(location.search);q.set('gcin',id);history.replaceState(null,'',`${location.pathname}?${q}`);this.app.draw();
   }
   search() {

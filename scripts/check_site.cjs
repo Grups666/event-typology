@@ -23,6 +23,8 @@ const fs = require('node:fs');
  await page.locator('#atlasResults button').first().click();
  assert.equal(await page.locator('#inspectorTitle').textContent(),'GCIN 3958');
  assert.match(await page.locator('#inspectorBody').textContent(),/0.755/);
+ assert.doesNotMatch(await page.locator('#inspectorBody').textContent(),/Event composition/);
+ assert.equal(await page.locator('#inspectorBody tbody tr').count(),5);
  await page.screenshot({path:path.join(folder,'inspector.png')});
  const download=page.waitForEvent('download');await page.locator('#atlasDownload').click();assert.match((await download).suggestedFilename(),/dormant.csv/);
  const pixel=await page.evaluate(()=>{const c=document.getElementById('mapCanvas'),d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let colored=0;for(let i=0;i<d.length;i+=4)if(Math.max(d[i],d[i+1],d[i+2])-Math.min(d[i],d[i+1],d[i+2])>60)colored++;return colored;});
