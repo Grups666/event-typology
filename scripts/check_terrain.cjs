@@ -10,6 +10,9 @@ const path=require('node:path');
    await page.goto(process.env.ATLAS_URL||'http://127.0.0.1:8873/');
    await page.waitForFunction(()=>window.AtlasTerrain?.ready && AtlasTerrain.borders.length>0 && document.getElementById('atlasCount')?.textContent.includes('4,838'));
    await page.waitForTimeout(350);
+   assert(await page.evaluate(()=>AtlasTerrain.borders.every(line=>line.every(p=>p[1]>-60))));
+   assert(await page.evaluate(()=>!App.renderBasemap.toString().includes('LAND_50M')));
+   assert(await page.evaluate(()=>!App.drawNow.toString().includes('// Grid')));
    const results=await page.evaluate(()=>{
     const checks=[];
     for(const scale of [0.01,1,2,6]) for(const y of [-1e6,0,1e6]) {

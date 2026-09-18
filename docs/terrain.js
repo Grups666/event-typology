@@ -5,13 +5,13 @@ window.AtlasTerrain = {
   load(redraw) {
     this.image = new Image();
     this.image.onload = () => { this.ready = true; redraw(); };
-    this.image.onerror = () => console.warn('Terrain unavailable; using vector basemap.');
-    this.image.src = './assets/earth-relief.webp';
+    this.image.onerror = () => console.warn('Satellite image unavailable.');
+    this.image.src = './assets/blue-marble.jpg';
     fetch('./assets/admin-boundaries.geojson').then(r=>{
       if(!r.ok)throw new Error('Boundary data unavailable');
       return r.json();
     }).then(data=>{
-      this.borders=data.features.flatMap(f=>f.geometry.type==='LineString'?[f.geometry.coordinates]:f.geometry.coordinates);
+      this.borders=data.features.flatMap(f=>f.geometry.type==='LineString'?[f.geometry.coordinates]:f.geometry.coordinates).filter(line=>line.every(p=>p[1]>-60));
       redraw();
     }).catch(error=>console.warn(error.message));
   },
@@ -22,7 +22,7 @@ window.AtlasTerrain = {
     const right = (width/2-offsetX)/base;
     ctx.save();
     if (this.ready) {
-      ctx.globalAlpha = 0.22;
+      ctx.globalAlpha = 0.38;
       ctx.imageSmoothingEnabled = true;
       for (let seg=Math.ceil((left-180)/360);seg<=Math.floor((right+180)/360);seg++) {
         ctx.drawImage(this.image,width/2+(-180+seg*360)*base+offsetX,

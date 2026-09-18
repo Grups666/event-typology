@@ -20,8 +20,7 @@ html = (site / 'index.html').read_text(encoding='utf-8')
 html = html.replace('<title>Tereon</title>', '<title>Event Typology | Global Catchment Atlas</title>')
 html = html.replace('</head>', '<link rel="stylesheet" href="./atlas.css">\n<script src="./terrain.js"></script>\n</head>')
 html = html.replace('staticModules: [],', 'staticModules: [{id: "event-typology", name: "Event Typology", defaultLoad: true}],')
-html = html.replace("background: ['#f7fafc', '#eef6f8', '#e7f0f4']", "background: ['#e3eff8', '#d5e9f5', '#cbdfeF']")
-html = html.replace("landFill: 'rgba(255, 255, 255, 0.92)'", "landFill: 'rgba(229, 239, 211, 0.96)'")
+html = html.replace("background: ['#f7fafc', '#eef6f8', '#e7f0f4']", "background: ['#ffffff', '#ffffff', '#ffffff']")
 # The world must always cover the viewport vertically, even on narrow screens.
 html = html.replace('viewport: { width: 0, height: 0, scale: 1, offsetX: 0, offsetY: 0 }', 'viewport: { width: 0, height: 0, scale: 0, offsetX: 0, offsetY: 0 }')
 html = html.replace("        window.addEventListener('resize', () => this.resize());", """        window.addEventListener('resize', () => this.resize());
@@ -44,33 +43,24 @@ html = html.replace('        // Background\n', '''        ctx.fillStyle = this.t
         // Background
 ''')
 html = html.replace('        viewport.interacting = false;', '        ctx.restore();\n        viewport.interacting = false;')
-# Polar and antimeridian polygon closures are not physical coastlines.
+# The satellite image is the only sea/land background; never draw vector coasts.
 basemap_start = html.index('      renderBasemap(ctx, viewport) {')
 basemap_end = html.index('      renderRasterTiles(', basemap_start)
-basemap = html[basemap_start:basemap_end]
-basemap = basemap.replace('            ctx.stroke(path);', '''            const coast = new Path2D();
-            for (let i = 0; i < ring.length; i++) {
-              const [lon, lat] = ring[i];
-              const previous = ring[Math.max(0, i - 1)];
-              const closure = lat <= -89.99 || previous[1] <= -89.99 ||
-                (Math.abs(lon) >= 179.99 && Math.abs(previous[0]) >= 179.99);
-              const x = width / 2 + (lon + lonOffset) * base + offsetX;
-              const y = height / 2 - lat * base + offsetY;
-              if (i === 0 || closure) coast.moveTo(x, y);
-              else coast.lineTo(x, y);
-            }
-            // No coastline stroke: land/ocean color provides the separation.
-''')
-last = basemap.rfind('      },')
-basemap = basemap[:last] + '        AtlasTerrain.render(ctx, this, viewport);\n' + basemap[last:]
-html = html[:basemap_start] + basemap + html[basemap_end:]
+html = html[:basemap_start] + '''      renderBasemap(ctx, viewport) {
+        AtlasTerrain.render(ctx, this, viewport);
+      },
+
+''' + html[basemap_end:]
+grid_start = html.index('        // Grid\n', html.index('      drawNow('))
+grid_end = html.index('        // Layers\n', grid_start)
+html = html[:grid_start] + html[grid_end:]
 attribution_start = html.index('      updateMapAttribution() {')
 attribution_end = html.index('      drawNow(', attribution_start)
 html = html[:attribution_start] + '''      updateMapAttribution() {
         const el = document.getElementById('statusAttribution');
         if (!el) return;
         el.classList.add('visible');
-        el.innerHTML = '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> | Relief & boundaries';
+        el.innerHTML = '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography-bathymetry/" target="_blank" rel="noopener">NASA Blue Marble</a> | <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth boundaries</a>';
       },
 
 ''' + html[attribution_end:]

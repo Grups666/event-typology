@@ -955,9 +955,9 @@
       mapStyles: {
         light: {
           label: 'Light',
-          background: ['#e3eff8', '#d5e9f5', '#cbdfeF'],
+          background: ['#ffffff', '#ffffff', '#ffffff'],
           grid: 'rgba(112, 128, 144, 0.15)',
-          landFill: 'rgba(229, 239, 211, 0.96)',
+          landFill: 'rgba(255, 255, 255, 0.92)',
           landStroke: 'rgba(72, 84, 96, 0.3)',
           basinStroke: 'rgba(72, 84, 96, 0.15)',
           countryStroke: 'rgba(51, 65, 85, 0.38)'
@@ -1745,7 +1745,7 @@
         const el = document.getElementById('statusAttribution');
         if (!el) return;
         el.classList.add('visible');
-        el.innerHTML = '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> | Relief & boundaries';
+        el.innerHTML = '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-topography-bathymetry/" target="_blank" rel="noopener">NASA Blue Marble</a> | <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth boundaries</a>';
       },
 
       drawNow(renderState = {}) {
@@ -1774,27 +1774,6 @@
           this.renderRasterTiles(ctx, viewport, this.imageryLayer.tileUrl);
         }
 
-        // Grid
-        ctx.strokeStyle = theme.grid;
-        ctx.lineWidth = 1;
-        const base = this.getBaseScale();
-        const leftLon = (-width / 2 - viewport.offsetX) / base;
-        const rightLon = (width / 2 - viewport.offsetX) / base;
-        for (let lon = Math.floor(leftLon / 30) * 30; lon <= rightLon; lon += 30) {
-          const x = width / 2 + lon * base + viewport.offsetX;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-          ctx.stroke();
-        }
-        for (let lat = -60; lat <= 60; lat += 20) {
-          const y = height / 2 - lat * base + viewport.offsetY;
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(width, y);
-          ctx.stroke();
-        }
-
         // Layers
         for (const layer of this.layerManager.getLayers()) {
           if (!layer.visible) continue;
@@ -1807,48 +1786,6 @@
       },
 
       renderBasemap(ctx, viewport) {
-        const landRings = window.LAND_50M || [];
-        const base = this.getBaseScale();
-        const { width, height, offsetX, offsetY } = viewport;
-        const style = this.getCurrentMapStyle();
-
-        const leftLon = (-width / 2 - offsetX) / base;
-        const rightLon = (width / 2 - offsetX) / base;
-        const firstSeg = Math.floor(leftLon / 360);
-        const lastSeg = Math.ceil(rightLon / 360);
-
-        ctx.fillStyle = style.landFill || 'transparent';
-        ctx.strokeStyle = style.landStroke;
-        ctx.lineWidth = 0.5;
-
-        for (let seg = firstSeg; seg <= lastSeg; seg++) {
-          const lonOffset = seg * 360;
-          for (const ring of landRings) {
-            if (ring.length < 3) continue;
-            const path = new Path2D();
-            for (let i = 0; i < ring.length; i++) {
-              const [lon, lat] = ring[i];
-              const x = width / 2 + (lon + lonOffset) * base + offsetX;
-              const y = height / 2 - lat * base + offsetY;
-                if (i === 0) path.moveTo(x, y);
-                else path.lineTo(x, y);
-              }
-            if (!this.imageryEnabled && style.landFill) ctx.fill(path);
-            const coast = new Path2D();
-            for (let i = 0; i < ring.length; i++) {
-              const [lon, lat] = ring[i];
-              const previous = ring[Math.max(0, i - 1)];
-              const closure = lat <= -89.99 || previous[1] <= -89.99 ||
-                (Math.abs(lon) >= 179.99 && Math.abs(previous[0]) >= 179.99);
-              const x = width / 2 + (lon + lonOffset) * base + offsetX;
-              const y = height / 2 - lat * base + offsetY;
-              if (i === 0 || closure) coast.moveTo(x, y);
-              else coast.lineTo(x, y);
-            }
-            // No coastline stroke: land/ocean color provides the separation.
-
-          }
-        }
         AtlasTerrain.render(ctx, this, viewport);
       },
 
