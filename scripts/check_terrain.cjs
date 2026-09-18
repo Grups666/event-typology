@@ -8,7 +8,7 @@ const path=require('node:path');
    const page=await browser.newPage({viewport:{width,height:900}});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(process.env.ATLAS_URL||'http://127.0.0.1:8873/');
-   await page.waitForFunction(()=>window.AtlasTerrain?.ready && document.getElementById('atlasCount')?.textContent.includes('4,838'));
+   await page.waitForFunction(()=>window.AtlasTerrain?.ready && AtlasTerrain.borders.length>0 && document.getElementById('atlasCount')?.textContent.includes('4,838'));
    await page.waitForTimeout(350);
    const results=await page.evaluate(()=>{
     const checks=[];

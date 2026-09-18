@@ -955,9 +955,9 @@
       mapStyles: {
         light: {
           label: 'Light',
-          background: ['#f7fafc', '#eef6f8', '#e7f0f4'],
+          background: ['#e3eff8', '#d5e9f5', '#cbdfeF'],
           grid: 'rgba(112, 128, 144, 0.15)',
-          landFill: 'rgba(255, 255, 255, 0.92)',
+          landFill: 'rgba(229, 239, 211, 0.96)',
           landStroke: 'rgba(72, 84, 96, 0.3)',
           basinStroke: 'rgba(72, 84, 96, 0.15)',
           countryStroke: 'rgba(51, 65, 85, 0.38)'
@@ -1845,7 +1845,8 @@
               if (i === 0 || closure) coast.moveTo(x, y);
               else coast.lineTo(x, y);
             }
-            ctx.stroke(coast);
+            // No coastline stroke: land/ocean color provides the separation.
+
           }
         }
         AtlasTerrain.render(ctx, this, viewport);

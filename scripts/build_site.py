@@ -20,6 +20,8 @@ html = (site / 'index.html').read_text(encoding='utf-8')
 html = html.replace('<title>Tereon</title>', '<title>Event Typology | Global Catchment Atlas</title>')
 html = html.replace('</head>', '<link rel="stylesheet" href="./atlas.css">\n<script src="./terrain.js"></script>\n</head>')
 html = html.replace('staticModules: [],', 'staticModules: [{id: "event-typology", name: "Event Typology", defaultLoad: true}],')
+html = html.replace("background: ['#f7fafc', '#eef6f8', '#e7f0f4']", "background: ['#e3eff8', '#d5e9f5', '#cbdfeF']")
+html = html.replace("landFill: 'rgba(255, 255, 255, 0.92)'", "landFill: 'rgba(229, 239, 211, 0.96)'")
 # The world must always cover the viewport vertically, even on narrow screens.
 html = html.replace('viewport: { width: 0, height: 0, scale: 1, offsetX: 0, offsetY: 0 }', 'viewport: { width: 0, height: 0, scale: 0, offsetX: 0, offsetY: 0 }')
 html = html.replace("        window.addEventListener('resize', () => this.resize());", """        window.addEventListener('resize', () => this.resize());
@@ -57,7 +59,8 @@ basemap = basemap.replace('            ctx.stroke(path);', '''            const 
               if (i === 0 || closure) coast.moveTo(x, y);
               else coast.lineTo(x, y);
             }
-            ctx.stroke(coast);''')
+            // No coastline stroke: land/ocean color provides the separation.
+''')
 last = basemap.rfind('      },')
 basemap = basemap[:last] + '        AtlasTerrain.render(ctx, this, viewport);\n' + basemap[last:]
 html = html[:basemap_start] + basemap + html[basemap_end:]
