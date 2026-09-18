@@ -769,6 +769,7 @@
       }
     </style>
   <link rel="stylesheet" href="./atlas.css">
+<script src="./terrain.js"></script>
 </head>
   <body>
     <!-- Map Area - Full screen background -->
@@ -1046,6 +1047,7 @@
           if (rect.width !== this.viewport.width || rect.height !== this.viewport.height) this.resize();
         });
         this.mapResizeObserver.observe(this.canvas.parentElement);
+        AtlasTerrain.load(() => this.draw());
       },
 
       // Canvas bounding rect (updated on resize)
@@ -1674,7 +1676,7 @@
       },
 
       getMinViewportScale() {
-        return Math.min(180 / this.getWorldLatitudeSpan(), 180 * this.viewport.width / (360 * this.viewport.height));
+        return 180 / this.getWorldLatitudeSpan();
       },
 
       ensureViewportScale() {
@@ -1742,14 +1744,8 @@
       updateMapAttribution() {
         const el = document.getElementById('statusAttribution');
         if (!el) return;
-        const attribution = this.imageryEnabled ? this.imageryLayer.attribution : '';
-        if (!attribution) {
-          el.classList.remove('visible');
-          el.innerHTML = '';
-          return;
-        }
         el.classList.add('visible');
-        el.innerHTML = `${this.escape(attribution)} - <a href="https://www.esri.com/en-us/legal/terms/data-attributions" target="_blank" rel="noopener">Attribution</a>`;
+        el.innerHTML = '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> | Relief & boundaries';
       },
 
       drawNow(renderState = {}) {
@@ -1852,6 +1848,7 @@
             ctx.stroke(coast);
           }
         }
+        AtlasTerrain.render(ctx, this, viewport);
       },
 
       renderRasterTiles(ctx, viewport, tileUrl) {

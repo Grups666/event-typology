@@ -20,6 +20,9 @@ Both types and the original composition are available in the inspector.
 The only thematic map is hydro-meteorological type. Consistency and daily/weekly
 coherence remain available in each catchment's inspector and CSV download.
 Optional outline layers and the layer controls are not exposed in this atlas.
+The fixed background includes faint Natural Earth land/ocean relief and national
+boundaries. Its source is documented in `assets/earth-relief-source.md`.
+Minimum zoom and vertical pan limits keep the polar map edges outside the viewport.
 The optional high-consistency filter uses the strict CI > 0.9 criterion.
 CSV downloads contain the currently filtered seasonal records.
 

@@ -18,9 +18,9 @@ site = root / 'docs'
 shutil.copytree(args.template / 'public', site, dirs_exist_ok=True)
 html = (site / 'index.html').read_text(encoding='utf-8')
 html = html.replace('<title>Tereon</title>', '<title>Event Typology | Global Catchment Atlas</title>')
-html = html.replace('</head>', '<link rel="stylesheet" href="./atlas.css">\n</head>')
+html = html.replace('</head>', '<link rel="stylesheet" href="./atlas.css">\n<script src="./terrain.js"></script>\n</head>')
 html = html.replace('staticModules: [],', 'staticModules: [{id: "event-typology", name: "Event Typology", defaultLoad: true}],')
-html = html.replace('return 180 / this.getWorldLatitudeSpan();', 'return Math.min(180 / this.getWorldLatitudeSpan(), 180 * this.viewport.width / (360 * this.viewport.height));')
+# The world must always cover the viewport vertically, even on narrow screens.
 html = html.replace('viewport: { width: 0, height: 0, scale: 1, offsetX: 0, offsetY: 0 }', 'viewport: { width: 0, height: 0, scale: 0, offsetX: 0, offsetY: 0 }')
 html = html.replace("        window.addEventListener('resize', () => this.resize());", """        window.addEventListener('resize', () => this.resize());
         this.mapResizeObserver = new ResizeObserver(() => {
@@ -28,6 +28,7 @@ html = html.replace("        window.addEventListener('resize', () => this.resize
           if (rect.width !== this.viewport.width || rect.height !== this.viewport.height) this.resize();
         });
         this.mapResizeObserver.observe(this.canvas.parentElement);""")
+html = html.replace('        this.mapResizeObserver.observe(this.canvas.parentElement);', '        this.mapResizeObserver.observe(this.canvas.parentElement);\n        AtlasTerrain.load(() => this.draw());')
 html = html.replace('`${lon.toFixed(1)} deg, ${lat.toFixed(1)} deg`', 'Math.abs(lat) > 90 ? "--" : `${(((lon + 180) % 360 + 360) % 360 - 180).toFixed(1)} deg, ${lat.toFixed(1)} deg`')
 # Keep the graticule and layers inside real geographic latitude bounds.
 html = html.replace('        // Background\n', '''        ctx.fillStyle = this.themeStyle === 'dark' ? '#18212b' : '#ffffff';
@@ -57,7 +58,19 @@ basemap = basemap.replace('            ctx.stroke(path);', '''            const 
               else coast.lineTo(x, y);
             }
             ctx.stroke(coast);''')
+last = basemap.rfind('      },')
+basemap = basemap[:last] + '        AtlasTerrain.render(ctx, this, viewport);\n' + basemap[last:]
 html = html[:basemap_start] + basemap + html[basemap_end:]
+attribution_start = html.index('      updateMapAttribution() {')
+attribution_end = html.index('      drawNow(', attribution_start)
+html = html[:attribution_start] + '''      updateMapAttribution() {
+        const el = document.getElementById('statusAttribution');
+        if (!el) return;
+        el.classList.add('visible');
+        el.innerHTML = '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> | Relief & boundaries';
+      },
+
+''' + html[attribution_end:]
 start = html.index('      async fetchModules() {')
 end = html.index('      async loadDefaultModules()', start)
 html = html[:start] + '      async fetchModules() { this.modules = this.staticModules; this.updateModuleList(); },\n\n' + html[end:]
